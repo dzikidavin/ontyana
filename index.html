@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday</title>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(circle at bottom, #2b0f1a, #000);
+  overflow: hidden;
+  font-family: system-ui, sans-serif;
+}
+
+#intro {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+  z-index: 10;
+}
+
+#intro h1 {
+  color: #ffd6e3;
+  font-size: 36px;
+  font-weight: 500;
+}
+
+#intro button {
+  padding: 14px 44px;
+  border-radius: 50px;
+  border: none;
+  background: #e0456f;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+canvas {
+  display: block;
+}
+</style>
+</head>
+
+<body>
+
+<div id="intro">
+  <h1>Happy Birthday Khairana!</h1>
+  <button onclick="start()">Klik</button>
+</div>
+
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+resize();
+
+window.addEventListener("resize", resize);
+
+let t = 0;
+let started = false;
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+function drawStem(progress) {
+  ctx.strokeStyle = "#3fa66a";
+  ctx.lineWidth = 10;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(canvas.width/2, canvas.height);
+  ctx.lineTo(canvas.width/2, canvas.height - progress * 400);
+  ctx.stroke();
+}
+
+function drawPetal(x, y, angle, open) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+  ctx.scale(open, open);
+
+  const g = ctx.createRadialGradient(0, -20, 10, 0, -40, 90);
+  g.addColorStop(0, "#fff");
+  g.addColorStop(1, "#ffb7cd");
+
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.bezierCurveTo(-40, -60, -20, -120, 0, -150);
+  ctx.bezierCurveTo(20, -120, 40, -60, 0, 0);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawFlower(x, y, open) {
+  const petals = 6;
+  for (let i = 0; i < petals; i++) {
+    drawPetal(x, y, (Math.PI*2/petals)*i, open);
+  }
+
+  ctx.fillStyle = "#ffd27d";
+  ctx.beginPath();
+  ctx.arc(x, y-30, 12, 0, Math.PI*2);
+  ctx.fill();
+}
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (started) {
+    t += 0.008;
+
+    const stemGrow = Math.min(t*1.2, 1);
+    drawStem(stemGrow);
+
+    if (t > 0.8) {
+      const open = Math.min((t-0.8)*1.4, 1);
+      const baseY = canvas.height - 400;
+
+      drawFlower(canvas.width/2, baseY, open);
+      drawFlower(canvas.width/2 - 120, baseY + 40, open*0.9);
+      drawFlower(canvas.width/2 + 120, baseY + 40, open*0.9);
+      drawFlower(canvas.width/2 - 60, baseY + 100, open*0.8);
+      drawFlower(canvas.width/2 + 60, baseY + 100, open*0.8);
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
+
+function start() {
+  document.getElementById("intro").style.display = "none";
+  started = true;
+}
+
+animate();
+</script>
+
+</body>
+</html>
